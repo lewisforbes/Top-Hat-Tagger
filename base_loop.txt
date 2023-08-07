@@ -3,7 +3,7 @@ Loop, *q count*
 	Prefix = *prefix**(sub)folder*
 	Qindex := A_index+*q offset*
 	Suffix = Q%Qindex%
-	Send, {Tab}{Tab}{Tab}{Tab}{Tab}*extra tab*
+	Send, *tabs*
 	Send, {Enter}
 	Sleep, 500
 	Send, {Home}
