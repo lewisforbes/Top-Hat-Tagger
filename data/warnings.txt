@@ -1,0 +1,4 @@
+; this script has been tested in Chrome
+; it relies on your pc being fast - close all apps/tabs apart from tophat
+
+; to use, run the script then (within 3 seconds) click on the first question in the folder.

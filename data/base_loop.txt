@@ -1,0 +1,25 @@
+Loop, *q count*
+{
+	Prefix = *prefix**(sub)folder*
+	Qindex := A_index+*q offset*
+	Suffix = Q%Qindex%
+	Send, *tabs*
+	Send, {Enter}
+	Sleep, 500
+	Send, {Home}
+    Send, %Prefix%%Suffix%
+	SendEvent, {Space}
+	Sleep, 1000
+	Send, {Shift Down}{Tab}{Tab}{Shift Up}
+	Send, {Enter}		
+	Sleep, *save time*
+	Send, {Tab}{Enter}
+	Sleep, *new q time*
+	Send, {Tab}{Tab}{Tab}{Tab}
+	Send, {Down}{Enter}
+	Sleep, 1000
+}
+Send, {Down}
+Sleep, 200
+Send, {Enter}
+Sleep, 1000

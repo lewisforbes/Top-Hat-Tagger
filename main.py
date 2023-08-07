@@ -1,127 +1,198 @@
-tabs = 5
+import time 
 
+class Tagger_Gen:
+    def __init__(self):
+        self.config     = "config.txt"
+        data_dir        = "data/"
+        self.base_loop  = data_dir+"base_loop.txt"
+        self.warnings   = data_dir+"warnings.txt"
+        self.welcome    = data_dir+"welcome.txt"
+        self.tagger     = "tagger.ahk" # output
 
-def folder_is_zero(prefix):
-    try:
-        if int(prefix[1:-1])==0:
-            return True
-    except:
-        return False
-    
-def manual_tab_count(tabs_original):
-    cancel = "q"
-    print("Overwriting tabs, enter {} to cancel.".format(cancel))
-    while(True):
-        tabs = input("Enter number of tabs: ")
-        if tabs==cancel:
-            return tabs_original
+        self.save_time  = 6000
+        self.new_q_time = 1000
+
+        self.tabs_override = None
+        self.tabs = 5
+        self.sub = None
+
+        self.print_welcome()
+
+        self.read_config()
+        self.prefix     = self.get_prefix()
+        self.fst_f      = self.get_fst_f()
+        self.q_offset   = self.get_q_offset()
+        self.f_n        = self.get_f_n()
+        self.f_qs       = self.get_f_qs()
+
+        self.replacements   = None
+        self.write_tagger(self.mk_tagger())
+
+        print("Complete, closing shortly.")
+        time.sleep(5)
+
+    def print_welcome(self):
+        f = open(self.welcome, "r")
+        longest = 0
+        msg=""
+        for line in f:
+            msg+=line
+            if len(line)>longest:
+                longest=len(line)
         
-        if not tabs.isdigit():
+        bar = "-"*longest
+        print(bar, msg, bar, sep="\n", end="\n\n")
+        f.close()
+
+    def read_config(self):        
+        default = "default"
+        comment = "#"
+        equals = ":="
+
+        f = open(self.config, "r")
+        for line in f:
+            if (comment in line) or (not (equals in line)):
+                continue
+
+            line_value = line.split(equals)[1].strip()
+            if line_value!=default and not line_value.isdigit():
+                input("Invalid value in {}: {}.\nConsider resetting config.\nPress enter to exit.".format(self.config, line_value))
+                raise Exception()
+                
+            if "tabs" in line:
+                if line_value==default:
+                    self.tabs_override = False
+                else:
+                    self.tabs_override = True
+                    self.tabs = int(line_value)
+                    print("Using tabs provided in {}".format(self.config))
+
+            if ("save_time" in line) and (line_value!=default):
+                self.save_time = int(line_value)
+            if ("new_q_time" in line) and (line_value!=default):
+                self.new_q_time = int(line_value)
+        f.close()
+
+    def get_prefix(self):
+        def folder_is_zero(prefix):
+            try:
+                if int(prefix[1:-1])==0:
+                    return True
+            except:
+                return False
+            
+        while(True):
+            prefix = input("Enter prefix (for example F1S, F etc.): ").upper()
+
+            if not "F" in prefix:
+                print("invalid format")
+                continue
+
+            if "S" in prefix:
+                if folder_is_zero(prefix):
+                    print("invalid format")
+                    continue
+                if not self.tabs_override:
+                    self.tabs+=1
+
+            if "S" in prefix:
+                self.sub = "sub"
+            else:
+                self.sub = ""
+            return prefix
+
+    def get_q_offset(self):
+        while(True):
+            fst_q = input("Enter number of first question: ")
+            if not fst_q.isdigit():
+                print("invalid format")
+                continue
+            fst_q = int(fst_q)
+            if fst_q<1:
+                print("invalid format")
+                continue
+            
+            return fst_q-1
+    
+    def get_fst_f(self):
+        while(True):
+            fst_f = input("Enter number of first {}folder: ".format(self.sub))
+            if not fst_f.isdigit():
+                print("invalid format")
+                continue
+            fst_f = int(fst_f)
+            if fst_f<0:
+                print("invalid format")
+                continue
+            if fst_f==0:
+                if "S" in self.prefix:
+                    input("\nError: first folder is 0 and there are subfolders.\nPress enter to exit.")
+                    raise Exception()
+                if not self.tabs_override:
+                    self.tabs=4
+            return fst_f
+
+    def get_f_n(self):
+        while(True):
+            if self.fst_f==0:
+                print("Tagging F0 only.")
+                return 1
+
+            f_n = input("How many {}folders to tag? ".format(self.sub))
+            if f_n.isdigit():
+                return int(f_n)
             print("invalid format")
-            continue
-        tabs = int(tabs)
-        if tabs<0:
-            print("invalid format")
-            continue
-        return tabs
 
+    def get_f_qs(self):
+        f_qs = []
+        for f_i in range(0, self.f_n):
+            while(True):
+                f_q = input("How many questions in {}{} to tag? ".format(self.prefix, f_i+self.fst_f))
+                if f_q.isdigit():
+                    f_q = int(f_q)
+                    break
+                print("invalid format")
+            f_qs.append(f_q)
+        return f_qs
 
+    def get_replacements(self, i, q_count):
+        if self.replacements==None:
+            self.replacements = {"*tabs*"        : "{Tab}"*self.tabs,
+                                 "*prefix*"      : self.prefix,
+                                 "*q offset*"    : self.q_offset,
+                                 "*save time*"   : self.save_time,
+                                 "*new q time*"  : self.new_q_time}
 
+        self.replacements["*q count*"]      = q_count
+        self.replacements["*(sub)folder*"] = i+1+self.q_offset
+        return self.replacements
 
-while(True):
-    prefix = input("Enter prefix (for example F1S, F etc.): ").upper()
+    def mk_tagger(self):
+        f = open(self.base_loop, "r")
+        loop = f.read()
+        f.close()
 
-    if not "F" in prefix:
-        print("invalid format")
-        continue
+        script = ""
+        for i, q_count in enumerate(self.f_qs):
+            current = loop
+            for old,new in self.get_replacements(i, q_count).items():
+                current = current.replace(old, str(new))
+            script += current + "\n"
+            if i==0:
+                self.q_offset=0
 
-    if "S" in prefix:
-        if folder_is_zero(prefix):
-            print("invalid format")
-            continue
-        tabs=6
-    break
+        f = open(self.warnings, "r")
+        warnings = f.read()
+        f.close()
 
-sub = ""
-if "S" in prefix:
-    sub="sub"
+        print("\n" + warnings.replace("; ", ""))
+        print("\nUSE AT YOUR OWN RISK! PRESS [ESC] TO TERMINATE MACRO!")
 
-q_offset=0
-while(True):
-    fst_q = input("Enter number of first question: ")
-    if not fst_q.isdigit():
-        print("invalid format")
-        continue
-    fst_q = int(fst_q)
-    if fst_q<1:
-        print("invalid format")
-        continue
-    q_offset = str(fst_q-1)
-    break
+        return warnings + "\nSleep, 3000\n" + script + "\n\nExitApp\nEsc::ExitApp"
 
-f_offset = 0
-while(True):
-    fst_f = input("Enter number of first {}folder: ".format(sub))
-    if not fst_f.isdigit():
-        print("invalid format")
-        continue
-    fst_f = int(fst_f)
-    if fst_f<0:
-        print("invalid format")
-        continue
-    if fst_f==0:
-        if "S" in prefix:
-            input("\nError: first folder is 0 and there are subfolders.\nPress enter to exit.")
-            raise Exception()
-        tabs=4
-    f_offset = fst_f-1
-    break
+    def write_tagger(self, script):
+        f = open(self.tagger, "w")
+        f.write(script)
+        f.close()
 
-
-while(True):
-    if fst_f==0:
-        print("Tagging F0 only.")
-        f_n=1
-        break
-
-    f_n = input("How many {}folders to tag? ".format(sub))
-    if f_n.isdigit():
-        f_n = int(f_n)
-        break
-    print("invalid format")
-
-f_qs = []
-for f_i in range(1, f_n+1):
-    while(True):
-        f_q = input("How many questions in {}{} to tag? ".format(prefix, f_i+f_offset))
-        if f_q=="tabstabs":
-            tabs = manual_tab_count(tabs_original=tabs)
-            continue 
-        if f_q.isdigit():
-            f_q = int(f_q)
-            break
-        print("invalid format")
-    f_qs.append(f_q)
-
-
-f = open("base_loop.txt", "r")
-loop = f.read()
-f.close()
-
-main = ""
-for i, q_count in enumerate(f_qs):
-    main += loop.replace("*q count*", str(q_count)).replace("*(sub)folder*", str(i+1+f_offset)).replace("*tabs*", "{Tab}"*tabs).replace("*prefix*", prefix).replace("*q offset*", q_offset) + "\n"
-    if i==0:
-        q_offset="0"
-
-f = open("warnings.txt", "r")
-warnings = f.read()
-f.close()
-
-output = warnings + "\nSleep, 3000\n" + main
-f = open("tagger.ahk", "w")
-f.write(output + "\n\nExitApp\n\nEsc::ExitApp")
-f.close()
-
-print("\n" + warnings.replace("; ", ""))
-input("\nUSE AT YOUR OWN RISK! PRESS [ESC] TO TERMINATE MACRO!" + "\n\n[press enter to exit]")
+Tagger_Gen()

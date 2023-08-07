@@ -5,10 +5,10 @@
 Sleep, 3000
 Loop, 4
 {
-	Prefix = F1S11
-	Qindex := A_index+0
+	Prefix = F2
+	Qindex := A_index+1
 	Suffix = Q%Qindex%
-	Send, {Tab}{Tab}{Tab}{Tab}{Tab}{Tab}*
+	Send, {Tab}{Tab}{Tab}{Tab}{Tab}{Tab}
 	Send, {Enter}
 	Sleep, 500
 	Send, {Home}
@@ -19,7 +19,82 @@ Loop, 4
 	Send, {Enter}		
 	Sleep, 6000
 	Send, {Tab}{Enter}
-	Sleep, 200
+	Sleep, 1000
+	Send, {Tab}{Tab}{Tab}{Tab}
+	Send, {Down}{Enter}
+	Sleep, 1000
+}
+Send, {Down}
+Sleep, 200
+Send, {Enter}
+Sleep, 1000
+Loop, 4
+{
+	Prefix = F2
+	Qindex := A_index+1
+	Suffix = Q%Qindex%
+	Send, {Tab}{Tab}{Tab}{Tab}{Tab}{Tab}
+	Send, {Enter}
+	Sleep, 500
+	Send, {Home}
+    Send, %Prefix%%Suffix%
+	SendEvent, {Space}
+	Sleep, 1000
+	Send, {Shift Down}{Tab}{Tab}{Shift Up}
+	Send, {Enter}		
+	Sleep, 6000
+	Send, {Tab}{Enter}
+	Sleep, 1000
+	Send, {Tab}{Tab}{Tab}{Tab}
+	Send, {Down}{Enter}
+	Sleep, 1000
+}
+Send, {Down}
+Sleep, 200
+Send, {Enter}
+Sleep, 1000
+Loop, 3
+{
+	Prefix = F3
+	Qindex := A_index+1
+	Suffix = Q%Qindex%
+	Send, {Tab}{Tab}{Tab}{Tab}{Tab}{Tab}
+	Send, {Enter}
+	Sleep, 500
+	Send, {Home}
+    Send, %Prefix%%Suffix%
+	SendEvent, {Space}
+	Sleep, 1000
+	Send, {Shift Down}{Tab}{Tab}{Shift Up}
+	Send, {Enter}		
+	Sleep, 6000
+	Send, {Tab}{Enter}
+	Sleep, 1000
+	Send, {Tab}{Tab}{Tab}{Tab}
+	Send, {Down}{Enter}
+	Sleep, 1000
+}
+Send, {Down}
+Sleep, 200
+Send, {Enter}
+Sleep, 1000
+Loop, 5
+{
+	Prefix = F4
+	Qindex := A_index+1
+	Suffix = Q%Qindex%
+	Send, {Tab}{Tab}{Tab}{Tab}{Tab}{Tab}
+	Send, {Enter}
+	Sleep, 500
+	Send, {Home}
+    Send, %Prefix%%Suffix%
+	SendEvent, {Space}
+	Sleep, 1000
+	Send, {Shift Down}{Tab}{Tab}{Shift Up}
+	Send, {Enter}		
+	Sleep, 6000
+	Send, {Tab}{Enter}
+	Sleep, 1000
 	Send, {Tab}{Tab}{Tab}{Tab}
 	Send, {Down}{Enter}
 	Sleep, 1000
@@ -31,5 +106,4 @@ Sleep, 1000
 
 
 ExitApp
-
 Esc::ExitApp
