@@ -1,4 +1,4 @@
-# Top Hat Tagger
+# Top Hat Tagger ([download](https://github.com/lewisforbes/Top-Hat-Tagger/archive/refs/heads/main.zip))
 
 This program requires [AutoHotkey v1.1](https://www.autohotkey.com/) to run. It can cause destrictive actions if run wrong, and the <kbd>Esc</kbd> can be pressed when the script is running to kill it.
 
