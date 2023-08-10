@@ -1,7 +1,7 @@
 # all vars should be a integer or 'default'
 
 # number of tabs to 'edit' button
-tabs := 6
+tabs := default
 
 # time after saving new question name (ms)
 save_time := 6000

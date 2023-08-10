@@ -1,4 +1,4 @@
-import time 
+from re import findall
 
 class Tagger_Gen:
     def __init__(self):
@@ -28,8 +28,7 @@ class Tagger_Gen:
         self.replacements   = None
         self.write_tagger(self.mk_tagger())
 
-        print("Complete, closing shortly.")
-        time.sleep(5)
+        input("Complete, press enter to exit.")
 
     def print_welcome(self):
         f = open(self.welcome, "r")
@@ -81,24 +80,30 @@ class Tagger_Gen:
             except:
                 return False
             
+        def is_FnS(prefix):
+            return len(findall("F[0-9]S", prefix))==1 # n can't be 0
+            
+        print("Prefixes are the same for every question.\nExamples are F or F1S.")
         while(True):
-            prefix = input("Enter prefix (for example F1S, F etc.): ").upper()
+            prefix = input("Enter the prefix: ").upper()
 
-            if not "F" in prefix:
-                print("invalid format")
+            if prefix=="F":
+                self.sub = ""
+                return prefix
+            
+            if not is_FnS(prefix):
+                print("Invalid format.")
                 continue
 
-            if "S" in prefix:
-                if folder_is_zero(prefix):
-                    print("invalid format")
-                    continue
-                if not self.tabs_override:
-                    self.tabs+=1
+            if folder_is_zero(prefix):
+                print("Invalid format: folder cannot be 0 if there are subfolders.")
+                continue
 
-            if "S" in prefix:
-                self.sub = "sub"
-            else:
-                self.sub = ""
+            # prefix is valid FnS          
+            if not self.tabs_override:
+                self.tabs+=1
+            
+            self.sub = ""
             return prefix
 
     def get_q_offset(self):
@@ -164,7 +169,7 @@ class Tagger_Gen:
                                  "*new q time*"  : self.new_q_time}
 
         self.replacements["*q count*"]      = q_count
-        self.replacements["*(sub)folder*"] = i+1+self.q_offset
+        self.replacements["*(sub)folder*"] = i+self.fst_f
         return self.replacements
 
     def mk_tagger(self):
