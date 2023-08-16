@@ -83,7 +83,7 @@ class Tagger_Gen:
         def is_FnS(prefix):
             return len(findall("F[0-9]S", prefix))==1 # n can't be 0
             
-        print("Prefixes are the same for every question.\nExamples are F or F1S.")
+        print("Prefixes are the same for every (sub)folder tagged by this script.\nExamples are F or F1S.")
         while(True):
             prefix = input("Enter the prefix: ").upper()
 
@@ -103,7 +103,7 @@ class Tagger_Gen:
             if not self.tabs_override:
                 self.tabs+=1
             
-            self.sub = ""
+            self.sub = "sub"
             return prefix
 
     def get_q_offset(self):

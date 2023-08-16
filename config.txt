@@ -1,6 +1,6 @@
 # all vars should be a integer or 'default'
 
-# number of tabs to 'edit' button
+# number of tabs to 'edit' button. default is 5 for folders, 6 for subfolders
 tabs := default
 
 # time after saving new question name (ms)
