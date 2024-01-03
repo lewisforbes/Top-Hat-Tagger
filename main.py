@@ -164,11 +164,10 @@ class Tagger_Gen:
         if self.replacements==None:
             self.replacements = {"*tabs*"        : "{Tab}"*self.tabs,
                                  "*prefix*"      : self.prefix,
-                                 "*q offset*"    : self.q_offset,
                                  "*save time*"   : self.save_time,
                                  "*new q time*"  : self.new_q_time}
-
-        self.replacements["*q count*"]      = q_count
+        self.replacements["*q offset*"]      = self.q_offset
+        self.replacements["*q count*"]     = q_count
         self.replacements["*(sub)folder*"] = i+self.fst_f
         return self.replacements
 
@@ -180,6 +179,7 @@ class Tagger_Gen:
         script = ""
         for i, q_count in enumerate(self.f_qs):
             current = loop
+
             for old,new in self.get_replacements(i, q_count).items():
                 current = current.replace(old, str(new))
             script += current + "\n"
