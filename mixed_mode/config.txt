@@ -1,0 +1,8 @@
+prefix := F
+number := 1
+tabs := 5
+q_offset := 0
+all_questions := 3
+
+save_time := 5000
+new_q_time := 3000

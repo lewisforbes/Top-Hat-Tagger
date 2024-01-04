@@ -1,0 +1,21 @@
+Loop, *q_count*
+{
+	Folder = *folder*
+	Qindex := A_index+*q_offset*
+	Question = Q%Qindex%
+	Send, *tabs*
+	Send, {Enter}
+	Sleep, 500
+	Send, {Home}
+    Send, %Folder%%Question%
+	SendEvent, {Space}
+	Sleep, 1000
+	Send, {Shift Down}{Tab}*pink_tab*{Shift Up}
+	Send, {Enter}		
+	Sleep, *save_time*
+	Send, {Tab}{Enter}
+	Sleep, *new_q_time*
+	Send, {Tab}{Tab}{Tab}{Tab}
+	Send, {Down}{Enter}
+	Sleep, 1000
+}
